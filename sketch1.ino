@@ -48,12 +48,12 @@ void loop() {
                                  bounce from the transducer to the responder
                                */
    Serial.println(distance);
-   if(distance<=40){
+   if(distance<=40){           //conditional that only executes if we come within 40cm of the sensor
    
-   tone(buzzer, 3000);
+   tone(buzzer, 3000);         // buzzer beeps if conditional is true
 
-   digitalWrite(motor, HIGH);
-   delay(20000);
+   digitalWrite(motor, HIGH); 
+   delay(20000);              // delay for 20 seconds (we can always update this if we want a longer time for the motor to spin before reset)
     
    digitalWrite(motor, LOW);
    delay(100);
