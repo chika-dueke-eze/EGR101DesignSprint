@@ -1,72 +1,109 @@
-const int buzzer = 9; 
-
 #define trigPin 13
-
-#define echoPin 12 
-
+#define echoPin 12
 #define motor 6
+#include "pitches.h"
+
+const int buzzer = 9;
+int distmotor;
+float duration, distance;
 
 void setup() {
-  // put your setup code here, to run once:
- 
-  
-  Serial.begin(9600);
-  
+  Serial.begin (9600);
   pinMode(trigPin, OUTPUT);
-  
-  pinMode (echoPin, INPUT);
-  
-  pinMode(buzzer, OUTPUT);
-
-  pinMode(motor, OUTPUT);
-  
-  /*pinMode(5, OUTPUT);
-  
+  pinMode(echoPin, INPUT);
   pinMode(6, OUTPUT);
-  
-  pinMode(7, OUTPUT);*/
-  
-  }
+  digitalWrite(6, LOW);
+  distmotor = 0;
+}
 
 void loop() {
-  // put your main code here, to run repeatedly:
-    long duration, distance; 
+
+  // Write a pulse to the HC-SR04 Trigger Pin
+
   digitalWrite(trigPin, LOW);
-  
-  delay(2);
-  
+  delayMicroseconds(2);
   digitalWrite(trigPin, HIGH);
-  
-  delay(10);
-  
+  delayMicroseconds(10);
   digitalWrite(trigPin, LOW);
-  
-  duration= pulseIn(echoPin, HIGH);
-  
-  distance=(duration/2)/29.1;  /*This equation is used to accurately determine
-                                 distance by using the time taken for waves to 
-                                 bounce from the transducer to the responder
-                               */
-   Serial.println(distance);
-   if(distance<=40){           //conditional that only executes if we come within 40cm of the sensor
-   
-   tone(buzzer, 3000);         // buzzer beeps if conditional is true
 
-   digitalWrite(motor, HIGH); 
-   delay(20000);              // delay for 20 seconds (we can always update this if we want a longer time for the motor to spin before reset)
+  // Measure the response from the HC-SR04 Echo Pin
+
+  duration = pulseIn(echoPin, HIGH);
+
+  // Determine distance from duration
+  // Use 343 metres per second as speed of sound
+
+  distance = (duration / 2) * 0.0343;
+
+  // Send results to Serial Monitor
+
+  Serial.print("Distance = ");
+  if (distance >= 40 || distance <= 2) {
+    Serial.println("Out of range");
+    distmotor = 0;
+
+
+  }
+  else {
+    Serial.print(distance);
+    Serial.println(" cm");
+    distmotor = 1;
+  }
+
+  if (distmotor == 1) {
+    for (int x=0; x<=9; x= x+1){
+     analogWrite(6,0);
+     delay(30); 
+     analogWrite(6,60);
+     delay(50);
+     
+      tone(9, NOTE_C4, 250);
+      delay(300);
+      noTone(9);
+      
+      tone(9, NOTE_G3, 125);
+      delay(150);
+      noTone(9);
+      
+      tone(9, NOTE_G3, 125);
+      delay(150);
+      noTone(9);
+      
+      tone(9, NOTE_A3, 250);
+      delay(300);
+      noTone(9);
+      
+      tone(9, NOTE_G3, 250);
+      delay(300);
+      noTone(9);
+      
+      tone(9, REST, 250);
+      delay(300);
+      noTone(9);
+      
+      tone(9, NOTE_B3, 250);
+      delay(300);
+      noTone(9);
+      
+      tone(9, NOTE_C4, 250);  
+      delay(300);
+      noTone(9);
+
+    distmotor=0;
+    }
     
-   digitalWrite(motor, LOW);
-   delay(100);
+    digitalWrite (6, LOW);
+    noTone(buzzer);
+    delay(5000);
+    
 
-   
-   }
-   
-   else{      
-                
-   noTone(buzzer);
-    delay(1000);
-   }
+  }
+  else {
+    digitalWrite (6, LOW);
+    delay(500);
+    noTone(buzzer);
+    delay(500);
+  }
   
-   ;
   
 }
